@@ -1,0 +1,37 @@
+description: finetuning gpt neo for grad-school-math dataset
+
+env_defaults:
+  JOB_GPUS: 8
+  TRANSFORMERS_CACHE: /tmp/transformers_cache
+
+environment:
+  registry: grail.azurecr.io
+  username: grail
+  image: trace-codegen-pl:latest
+  setup:
+    # - echo "nameserver 8.8.8.8" | sudo tee /etc/resolvconf/resolv.conf.d/base > /dev/null
+    - pip install -r requirements.txt
+    - python -m nltk.downloader punkt
+    - pip install pytorch-lightning==1.4.5
+    - pip install scipy editdistance bashplotlib astunparse networkx
+
+code:
+  local_dir: $CONFIG_DIR/..
+
+storage:
+  data:
+    storage_account_name: wuphillyblob 
+    container_name: trace-codegen-data
+    local_dir: /mnt/trace-codegen-data
+
+data:
+  local_dir: data/gsmath
+  remote_dir: data/gsmath
+  storage_id: data
+
+jobs:
+  - name: gpt-neo-gsmath-state-finetuning
+    sku: 32G$JOB_GPUS@westus2,westus3,redmond,eastus
+    # sku: G$JOB_GPUS
+    command:
+      - bash amulet/gsmath-mml-finetuning.sh --trainer.progress_bar_refresh_rate 1 --trainer.gpus $JOB_GPUS

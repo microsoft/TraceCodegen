@@ -1,0 +1,61 @@
+description: notebook cell generation by iterative statement prediction, pytorch-lightning implementation
+
+env_defaults:
+  JOB_GPUS: 8
+
+environment:
+  registry: grail.azurecr.io
+  username: grail-acr-trace-codegen
+  image: trace-codegen/train:latest
+  setup:
+    - pip install -r requirements.txt
+#    - pip install torchmetrics==0.5.0
+#    - pip install horovod
+
+code:
+  local_dir: $CONFIG_DIR/..
+
+storage:
+  data:
+    storage_account_name: featurestorage
+    container_name: trace-codegen-data
+    local_dir: /mnt/trace-codegen-data
+
+data:
+#  local_dir: data/original_nb_stmt
+  local_dir: data/stmt-processed
+  remote_dir: data/stmt-processed
+  storage_id: data
+
+jobs:
+  - name: train-full-parameterized_gpu$JOB_GPUS
+    sku: 32G$JOB_GPUS@westus2,westus3,redmond,eastus
+    aml_mpirun:
+      communicator: OpenMpi
+      process_count_per_node: $JOB_GPUS
+    command:
+      - |-
+        amulet/lightning-cell-pred.sh \
+          --trainer.gpus $JOB_GPUS \
+          --model.opt_lr 1e-4 \
+          --data.max_context_tokens 412
+
+
+# search:
+#   job_template:
+#     name: search_codegen_{auto:3s}
+#     sku: 32G$JOB_GPUS@westus2,westus3,redmond,eastus
+#     aml_mpirun:
+#       communicator: OpenMpi
+#       process_count_per_node: 1
+#     command:
+#       - amulet/cell-stmt-pred-train.sh $JOB_GPUS 1e-4 {context_size}
+#   type: grid
+#   max_trials: 4
+#   params:
+#     # - name: lr
+#     #   spec: discrete
+#     #   values: [1e-4, 2e-4, 5e-4]
+#     - name: context_size
+#       spec: discrete
+#       values: [412, 924, 1436, 1940]

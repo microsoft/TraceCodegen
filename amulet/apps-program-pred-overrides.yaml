@@ -1,0 +1,28 @@
+trainer:
+  accelerator: ddp
+  # replace_sampler_ddp: False
+  # https://github.com/PyTorchLightning/pytorch-lightning/issues/8262
+  # plugins: "ddp_find_unused_parameters_false"
+  plugins: 
+    - class_path: pytorch_lightning.plugins.DeepSpeedPlugin
+      stage: 3
+      offload_optimizer: true
+      offload_parameters: true
+      overlap_comm: true
+      allgather_bucket_size: 7e8
+      reduce_bucket_size: 7e8
+      pin_memory: true
+      contiguous_gradients: true
+  precision: 16
+  progress_bar_refresh_rate: 1
+  log_every_n_steps: 1
+  accumulate_grad_batches: 4
+data:
+  batch_size: 1
+  val_batch_size: 2
+  # max_context_tokens: 412
+  # train_max_instances: 1000
+  # val_max_instances: 10
+model:
+  opt_lr: 1e-4
+  gradient_ckpt: true
