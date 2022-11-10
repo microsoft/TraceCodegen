@@ -1,0 +1,40 @@
+description: run batch jobs by spliting the machine
+
+env_defaults:
+  JOB_GPUS: 8
+  TRANSFORMERS_CACHE: /tmp/transformers_cache
+
+environment:
+  registry: grail.azurecr.io
+  username: grail
+  image: trace-codegen-pl:latest
+  setup:
+    - pip install -r requirements.txt
+    - pip install torchvision --upgrade
+    - pip install torchtext --upgrade
+    - pip install torchaudio --upgrade
+    - python -m nltk.downloader punkt
+    - pip install scipy editdistance bashplotlib astunparse networkx
+
+code:
+  local_dir: $CONFIG_DIR/..
+
+storage:
+  data:
+    storage_account_name: wuphillyblob 
+    container_name: trace-codegen-data
+    local_dir: /mnt/trace-codegen-data
+
+data:
+  local_dir: data/gsmath
+  remote_dir: data/gsmath
+  storage_id: data
+
+jobs:
+  - name: gpt-neo-gsmath-finetuning
+    sku: 32G$JOB_GPUS@westus2,westus3,redmond,eastus
+    submit_args:
+      env:
+        WANDB_API_KEY: $WANDB_API_KEY
+    command:
+      - bash amulet/gsmath-batch_jobs.sh
