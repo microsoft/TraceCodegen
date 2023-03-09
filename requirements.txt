@@ -6,7 +6,7 @@ torchmetrics == 0.6.0
 
 transformers == 4.16.2
 torch == 1.10.2
-pytorch-lightning == 1.5.10
+pytorch-lightning == 1.6.0
 deepspeed ~= 0.5.10
 
 # to avoid getting an error of "fit.optimizer" conflict namespace error
