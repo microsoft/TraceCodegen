@@ -11,7 +11,6 @@ from pytorch_lightning import LightningDataModule
 from torch.utils.data import Dataset
 
 from lightning_modules.models.gpt_util import get_gpt, left_pad_sequences
-from prompting.prompting_utils import text_to_code_prompting, mathqa_answer_prompting
 from execution.program_tracing import get_state_repr, is_trivial_state
 
 from torch.utils.data import DataLoader
@@ -79,17 +78,7 @@ class MathQADataset(Dataset):
     def get_test_few_shot_instance(self, example: Dict[str, Any], 
                                    few_shot_text_list: List[str],
                                    few_shot_code_list: List[str]) -> Dict[str, Any]:
-        example_dict = {"metadata": example}
-
-        prompt = text_to_code_prompting(few_shot_text_list, few_shot_code_list, example["text"])
-        tokenizer_outputs = self.tokenizer(prompt, return_tensors="pt")
-
-        example_dict["input_ids"] = tokenizer_outputs["input_ids"]
-        example_dict["attention_mask"] = tokenizer_outputs["attention_mask"]
-        example_dict["metadata"]["prompt"] = prompt
-        example_dict["metadata"]["pad_token_id"] = self.tokenizer.pad_token_id
-
-        return example_dict
+        raise NotImplementedError("get_test_few_shot_instance is deprecated.")
 
     def read(self, file_path: str) -> Iterable[Dict[str, Any]]:
         print("Reading dataset files at %s", file_path)

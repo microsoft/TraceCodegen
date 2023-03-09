@@ -20,7 +20,27 @@ from pytorch_lightning import LightningModule
 from .gpt_util import get_gpt
 from execution.execution_evaluation import execution_acc, mathqa_execution
 from execution.execution_evaluation import execution_eval_at_k, batch_execution_acc
-from analysis.mathqa_train_test_overlap import get_overlap_example_ids
+
+def get_overlap_example_ids(set_name: str, min_allow_dist: int) -> List[int]:
+    assert set_name in ['train', 'test', 'val']
+
+    save_path = f"analysis/train_{set_name}_overlap.npy"
+    sim_matrix = np.load(save_path)
+
+    # exclude itself in computing the most similar example when using the same set
+    if set_name == 'train':
+        np.fill_diagonal(sim_matrix, np.inf)
+
+    min_list = np.min(sim_matrix, axis=0) 
+
+    overlapping_ids = []
+    for i, min_dist in enumerate(min_list):
+        if min_dist > min_allow_dist:
+            continue
+        else:
+            overlapping_ids.append(i)
+
+    return overlapping_ids
 
 # from https://stackoverflow.com/questions/1769332/script-to-remove-python-comments-docstrings
 def remove_comments_and_docstrings(source):
