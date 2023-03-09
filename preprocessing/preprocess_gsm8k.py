@@ -243,5 +243,5 @@ def prune_gsmath(file_name: str) -> None:
         f.write("\n".join([json.dumps(ins) for ins in instances]))
 
 if __name__ == "__main__":
-    prune_gsmath("./data/gsmath/gsmath_val.jsonl")
-    # main()
+    # prune_gsmath("./data/gsmath/gsmath_val.jsonl")
+    main()

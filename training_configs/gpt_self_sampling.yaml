@@ -1,6 +1,6 @@
 seed_everything: 333
 trainer:
-  gpus: 2
+  gpus: 1
   gradient_clip_val: 1.0
   default_root_dir: debug-tmp
   # val_check_interval: 1.0
@@ -34,7 +34,7 @@ trainer:
   accelerator: gpu
   # replace_sampler_ddp: False
   # https://github.com/PyTorchLightning/pytorch-lightning/issues/8262
-  strategy: deepspeed_stage_2
+  strategy: deepspeed_stage_2_offload
   # strategy: ddp_find_unused_parameters_false
   # precision: 16
   # accumulate_grad_batches: 4
