@@ -5,7 +5,7 @@ tree-sitter ~= 0.19.0
 torchmetrics == 0.6.0
 
 transformers == 4.16.2
-torch == 1.10.2
+torch == 1.13.1
 pytorch-lightning == 1.5.10
 deepspeed ~= 0.5.10
 
